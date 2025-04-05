@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Responsive Weekly Timetable</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timetable Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <h1>Weekly Timetable Generator</h1>
-
+  
   <div class="input-section">
     <label>Enter Number of Subjects: </label>
-    <input type="number" id="subjectCount" min="1" />
+    <input type="number" id="subjectCount" min="1">
     <button onclick="createSubjectInputs()">Next</button>
 
     <div id="subjectInputs"></div>
@@ -22,103 +21,13 @@
 
   <div class="timetable">
     <div class="table-container" id="timetableOutput"></div>
+    <div id="facultyDetails" class="faculty-details"></div>
   </div>
 
   <div style="text-align: center;">
     <button class="download-btn" id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download PDF</button>
   </div>
 
-  <script>
-    let subjects = [];
-    let faculties = [];
-
-    function createSubjectInputs() {
-      subjects = [];
-      faculties = [];
-
-      const count = parseInt(document.getElementById('subjectCount').value);
-      const container = document.getElementById('subjectInputs');
-      container.innerHTML = '';
-
-      for (let i = 0; i < count; i++) {
-        container.innerHTML += `
-          <div class="subject-input">
-            <input type="text" placeholder="Subject ${i + 1}" id="sub${i}">
-            <input type="text" placeholder="Faculty ${i + 1}" id="fac${i}">
-          </div>
-        `;
-      }
-      document.getElementById('generateBtn').style.display = 'inline-block';
-    }
-
-    function generateDay(subjects, faculties) {
-      let used = {};
-      subjects.forEach(s => used[s] = 0);
-
-      let day = [];
-      while (day.length < 8) {
-        let available = subjects.filter(s => used[s] < 2);
-        if (available.length === 0) available = subjects;
-
-        let randomSub = available[Math.floor(Math.random() * available.length)];
-        let faculty = faculties[subjects.indexOf(randomSub)];
-
-        day.push(`${randomSub} (${faculty})`);
-        used[randomSub]++;
-      }
-      return day;
-    }
-
-    function generateTimetable() {
-      subjects = [];
-      faculties = [];
-
-      const count = parseInt(document.getElementById('subjectCount').value);
-      for (let i = 0; i < count; i++) {
-        const sub = document.getElementById(`sub${i}`).value;
-        const fac = document.getElementById(`fac${i}`).value;
-        subjects.push(sub);
-        faculties.push(fac);
-      }
-
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      let weekly = [];
-
-      days.forEach(day => {
-        weekly.push(generateDay(subjects, faculties));
-      });
-
-      let output = `<h2 style="text-align:center;">Weekly Timetable</h2>`;
-      output += `<div style="overflow-x:auto;"><table><tr><th>Period</th>`;
-      days.forEach(day => output += `<th>${day}</th>`);
-      output += `</tr>`;
-
-      for (let i = 0; i < 8; i++) {
-        output += `<tr><td>Period ${i + 1}</td>`;
-        for (let j = 0; j < days.length; j++) {
-          output += `<td>${weekly[j][i]}</td>`;
-        }
-        output += `</tr>`;
-      }
-
-      output += `</table></div>`;
-
-      document.getElementById('timetableOutput').innerHTML = output;
-      document.getElementById('downloadBtn').style.display = 'inline-block';
-    }
-
-    function downloadPDF() {
-      const element = document.getElementById('timetableOutput');
-      const opt = {
-        margin: 0.3,
-        filename: 'Weekly_Timetable.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
